@@ -23,8 +23,6 @@ from AIPlayerUtils import *
 #   playerId - The id of the player.
 ##
 
-
-
 class AIPlayer(Player):
 
     #__init__
@@ -43,10 +41,16 @@ class AIPlayer(Player):
 
 
     def heuristicStepsToGoal(self,currentState):
+
         
-        myInv=getCurrPlayerInventory(currentState)
+        ## if the queen is actually dead, dont evelauate the other states
         enInv=getEnemyInv(currentState)
         enQueen=enInv.getQueen()
+        if  enQueen == None:
+            print("DEAD QUEEN")
+            return 999999999
+
+        myInv=getCurrPlayerInventory(currentState)
         mySoldiers=getAntList(currentState,self.playerId,(DRONE,SOLDIER,R_SOLDIER,))
         myWorkers=getAntList(currentState,self.playerId,(WORKER,))
 
@@ -70,14 +74,8 @@ class AIPlayer(Player):
         else:
             avgSoldierStepsToQueen=50
             avgSoldierStepsToHill=50
+        return  foodVal + enInv.getAnthill().captureHealth + enQueen.health + avgSoldierStepsToHill + avgSoldierStepsToQueen + len(getAntList(currentState,self.enemyId,(WORKER,)))
 
-
-        enHillHealthVal=avgSoldierStepsToHill-enInv.getAnthill().captureHealth
-        enQueenHealthVal=avgSoldierStepsToQueen-enQueen.health
-
-
-
-        return enQueenHealthVal + foodVal + enHillHealthVal
 
     def buildNode(self,move,reachedState,depth=0,parentNode=None):
         nodeDict = {
@@ -201,8 +199,6 @@ class AIPlayer(Player):
             nodes.append(self.buildNode(move,getNextState(currentState,move),0,None))
 
 
-        if  getEnemyInv(currentState).getQueen() == None:
-            return None
         bestMove=self.bestMove(nodes)
         self.printBestMove(bestMove)
         return bestMove['move']
