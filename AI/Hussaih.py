@@ -58,8 +58,16 @@ class AIPlayer(Player):
         soldierVal = -len(mySoldiers)
         # get the steps to the goal based on food and worker count
         # foodval=(stepsToReach(currentState,self.myTunnel.coords,self.myFood.coords)*(11-myInv.foodCount))
-        foodVal = 11-myInv.foodCount
-
+        # foodVal = 11-myInv.foodCount
+        
+        foodVal = 0
+        for worker in myWorkers:
+            if (worker.carrying):
+                foodVal = foodVal + stepsToReach(currentState, worker.coords, self.myTunnel.coords)
+                            #find shortest distance to food for not carrying
+        #    else:
+        #        foodVal = foodVal + stepsToReach
+        
         # get the steps to goal based on soldier distance to queen/anthill and health fo queen/anthill
         avgSoldierStepsToQueen=0
         avgSoldierStepsToHill=0
